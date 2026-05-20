@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập - HeartCare AI</title>
+    <link rel="stylesheet" href="{% static 'diagnosis/style.css' %}">
+</head>
+<body class="login-page">
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h1>❤ HeartCare AI</h1>
+        <p>Đăng nhập hệ thống dự đoán bệnh tim</p>
+
+        {% if form.errors %}
+        <div class="login-error">
+            Tài khoản hoặc mật khẩu không đúng.
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label>Tên đăng nhập</label>
+            {{ form.username }}
+
+            <label>Mật khẩu</label>
+            {{ form.password }}
+
+            <button type="submit">Đăng nhập</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

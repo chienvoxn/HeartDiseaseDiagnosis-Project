@@ -1,50 +1,356 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Heart Disease Diagnosis</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 30px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 28px; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,0.08); }
-        h1 { margin-top: 0; }
-        form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
-        p { margin: 0; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; }
-        input, select { width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-        button { grid-column: 1 / -1; padding: 12px; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; background: #2563eb; color: white; }
-        .result { margin-top: 24px; padding: 18px; border-radius: 12px; }
-        .danger { background: #fee2e2; color: #991b1b; }
-        .safe { background: #dcfce7; color: #166534; }
-        .note { color: #666; margin-bottom: 20px; }
-        .nav { margin-bottom: 18px; }
-        .nav a { color: #2563eb; text-decoration: none; font-weight: 700; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeartCare AI</title>
+
+    <link rel="stylesheet" href="{% static 'diagnosis/style.css' %}">
 </head>
 <body>
-<div class="container">
-    <div class="nav">
-        <a href="/">Predict</a> |
-        <a href="/explanation/">Model Explanation with SHAP</a>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <div>
+        ✉ heartcareai@gmail.com
     </div>
 
-    <h1>Heart Disease Diagnosis</h1>
-    <p class="note">
-        Manual Random Forest + manual preprocessing pipeline. Không dùng scikit-learn để train model.
-        SHAP được dùng riêng cho bước giải thích mô hình.
-    </p>
-
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Predict</button>
-    </form>
-
-    {% if result %}
-        <div class="result {{ risk_label }}">
-            <h2>{{ result }}</h2>
-            <p>Probability of heart disease: <strong>{{ probability }}%</strong></p>
-        </div>
-    {% endif %}
+    <div>
+        ☎ 0899884498
+    </div>
 </div>
+
+<!-- NAVBAR -->
+<header class="navbar">
+    <div class="logo">
+        ❤ HeartCare AI
+    </div>
+    <nav>
+    <a href="{% url 'diagnosis' %}">Trang chủ</a>
+    <a href="#services">Dịch vụ</a>
+    <a href="{% url 'predict' %}">Dự đoán</a>
+    </nav>
+
+    <a href="{% url 'login' %}" class="nav-btn">
+        Đăng nhập
+    </a>
+
+</header>
+
+<!-- HERO -->
+<section class="hero">
+
+    <div class="overlay"></div>
+
+    <div class="hero-content">
+        <span class="badge">
+            AI Healthcare System
+        </span>
+
+        <h1>
+            Dự đoán nguy cơ bệnh tim bằng Machine Learning
+        </h1>
+
+        <p>
+            Hệ thống sử dụng Random Forest tự xây dựng để hỗ trợ phân tích
+            nguy cơ mắc bệnh tim dựa trên các chỉ số sức khỏe lâm sàng.
+        </p>
+
+    </div>
+
+</section>
+
+<!-- STATS -->
+<section class="stats">
+
+    <div class="stat-card">
+        <h2>Random Forest</h2>
+        <p>Mô hình chính</p>
+    </div>
+
+    <div class="stat-card">
+        <h2>920+</h2>
+        <p>Dữ liệu bệnh nhân</p>
+    </div>
+
+    <div class="stat-card">
+        <h2>Manual ML</h2>
+        <p>Tự code thuật toán</p>
+    </div>
+
+</section>
+
+<!-- ABOUT -->
+<section class="about">
+
+    <div class="about-image">
+        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80">
+    </div>
+
+    <div class="about-content">
+
+        <span class="section-badge">
+            Giới thiệu hệ thống
+        </span>
+
+        <h2>
+            Hệ thống hỗ trợ phân tích bệnh tim bằng AI
+        </h2>
+
+        <p>
+            Website được xây dựng bằng Django và Machine Learning nhằm hỗ trợ
+            dự đoán nguy cơ mắc bệnh tim dựa trên các thông số sức khỏe
+            của bệnh nhân.
+        </p>
+
+        <ul>
+            <li>✔ Random Forest tự code</li>
+            <li>✔ Pipeline preprocessing thủ công</li>
+            <li>✔ Django Web Application</li>
+        </ul>
+
+    </div>
+
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+
+    <div class="section-title">
+        <span class="section-badge">Dịch vụ hệ thống</span>
+
+        <h2>
+            Chức năng nổi bật
+        </h2>
+    </div>
+
+    <div class="service-grid">
+
+        <div class="service-card">
+
+    <img class="service-image"
+     src="https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=900&q=80">
+
+    <div class="service-content">
+        <div class="icon">🩺</div>
+
+        <h3>Dự đoán bệnh tim</h3>
+
+        <p>
+            Phân tích nguy cơ bệnh tim dựa trên dữ liệu lâm sàng.
+        </p>
+    </div>
+
+</div>
+
+<div class="service-card">
+
+    <img class="service-image"
+         src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=900&q=80">
+
+    <div class="service-content">
+        <div class="icon">📊</div>
+
+        <p>
+            Hiển thị đặc trưng ảnh hưởng lớn nhất đến mô hình.
+        </p>
+    </div>
+
+</div>
+
+<div class="service-card">
+
+    <img class="service-image"
+         src="https://images.unsplash.com/photo-1581595219315-a187dd40c322?auto=format&fit=crop&w=900&q=80">
+
+    <div class="service-content">
+        <div class="icon">⚙</div>
+
+        <h3>Random Forest Manual</h3>
+
+        <p>
+            Thuật toán được xây dựng thủ công bằng Python.
+        </p>
+    </div>
+
+</div>
+
+    </div>
+
+</section>
+
+<!-- PROCESS -->
+<section class="process">
+
+    <div class="section-title">
+        <span class="section-badge">Quy trình hoạt động</span>
+
+        <h2>
+            Hệ thống hoạt động như thế nào?
+        </h2>
+    </div>
+
+    <div class="process-grid">
+
+        <div class="process-card">
+            <span>01</span>
+            <h3>Nhập dữ liệu</h3>
+            <p>Người dùng nhập thông tin sức khỏe.</p>
+        </div>
+
+        <div class="process-card">
+            <span>02</span>
+            <h3>Tiền xử lý</h3>
+            <p>Pipeline chuẩn hóa dữ liệu đầu vào.</p>
+        </div>
+
+        <div class="process-card">
+            <span>03</span>
+            <h3>Random Forest</h3>
+            <p>Mô hình dự đoán nguy cơ bệnh tim.</p>
+        </div>
+
+        <div class="process-card">
+            <span>04</span>
+            <h3>Trả kết quả</h3>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FORM -->
+ <!-- HEALTHCARE TEAM -->
+<section class="health-team">
+    <div class="team-content">
+        <span class="section-badge">Chăm sóc sức khỏe thông minh</span>
+        <h2>Kết hợp y học và trí tuệ nhân tạo</h2>
+        <p>
+            HeartCare AI được xây dựng nhằm hỗ trợ người dùng nhận biết sớm
+            nguy cơ bệnh tim thông qua các chỉ số sức khỏe cơ bản.
+        </p>
+
+        <div class="team-list">
+            <div>✔ Phân tích dữ liệu bệnh nhân</div>
+            <div>✔ Hỗ trợ dự đoán nhanh</div>
+            <div>✔ Giao diện dễ sử dụng</div>
+        </div>
+    </div>
+
+    <div class="team-image">
+        <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1200&q=80">
+    </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery-section">
+    <div class="section-title">
+        <span class="section-badge">Hình ảnh sức khỏe</span>
+        <h2>Không gian y tế hiện đại</h2>
+        <p>Một số hình ảnh minh họa về chăm sóc sức khỏe, bác sĩ và công nghệ y tế.</p>
+    </div>
+
+    <div class="gallery-grid">
+        <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=900&q=80">
+        <img src="https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=900&q=80">
+        <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=900&q=80">
+        <img src="https://images.unsplash.com/photo-1580281657527-47f249e8f4df?auto=format&fit=crop&w=900&q=80">
+        <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=900&q=80">
+        <img src="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=900&q=80">
+    </div>
+</section>
+
+<!-- HEALTH TIPS -->
+<section class="tips-section">
+    <div class="section-title">
+        <span class="section-badge">Lời khuyên tim mạch</span>
+        <h2>Duy trì trái tim khỏe mạnh mỗi ngày</h2>
+    </div>
+
+    <div class="tips-grid">
+        <div class="tip-card">
+            <h3>🥗 Ăn uống lành mạnh</h3>
+            <p>Hạn chế chất béo xấu, tăng rau xanh, trái cây và thực phẩm giàu chất xơ.</p>
+        </div>
+
+        <div class="tip-card">
+            <h3>🏃 Vận động đều đặn</h3>
+            <p>Duy trì thói quen vận động nhẹ nhàng giúp cải thiện sức khỏe tim mạch.</p>
+        </div>
+
+        <div class="tip-card">
+            <h3>🩺 Kiểm tra định kỳ</h3>
+            <p>Theo dõi huyết áp, cholesterol và nhịp tim để phát hiện nguy cơ sớm.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+
+    <div class="footer-content">
+
+        <div>
+            <h3>HeartCare AI</h3>
+
+            <p>
+                Hệ thống dự đoán bệnh tim bằng Machine Learning và Django.
+            </p>
+        </div>
+
+        <div>
+            <h3>Công nghệ</h3>
+
+            <ul>
+                <li>Django</li>
+                <li>Random Forest</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>Dataset</h3>
+
+            <ul>
+                <li>UCI Heart Disease</li>
+                <li>920 bệnh nhân</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="copyright">
+        © 2026 HeartCare AI
+    </div>
+
+</footer>
+   <script>
+    const analyzeForms = document.querySelectorAll(".js-analyze-form");
+
+    analyzeForms.forEach(function (form) {
+        form.addEventListener("submit", function () {
+            const button = form.querySelector(".submit-btn");
+
+            if (button) {
+                button.innerHTML = "Đang phân tích dữ liệu...";
+                button.disabled = true;
+                button.classList.add("loading");
+            }
+        });
+    });
+
+    window.addEventListener("load", function () {
+        const resultBox = document.querySelector(".result-box") ||
+                          document.querySelector(".batch-result-box") ||
+                          document.querySelector(".upload-error-box");
+
+        if (resultBox) {
+            resultBox.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+    });
+</script>
 </body>
 </html>

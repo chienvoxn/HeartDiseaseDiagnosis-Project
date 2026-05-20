@@ -1,0 +1,113 @@
+{% extends "diagnosis/base_dashboard.html" %}
+
+{% block content %}
+
+<div class="dashboard-section-title">
+    <h2>Đánh giá kết quả mô hình</h2>
+    <p>Trang này hiển thị kết quả đánh giá từ lần dự đoán file gần nhất.</p>
+</div>
+
+{% if not has_result %}
+<div class="upload-error-box">
+    <h3>Chưa có dữ liệu đánh giá</h3>
+    <p>{{ message }}</p>
+
+    <a href="{% url 'predict' %}" class="download-btn">
+        Đi tới dự đoán bệnh tim
+    </a>
+</div>
+{% else %}
+
+<div class="overview-grid evaluation-grid">
+
+    <div class="overview-card">
+        <h3>Accuracy</h3>
+        <p>{{ accuracy }}%</p>
+    </div>
+
+    <div class="overview-card">
+        <h3>Precision</h3>
+        <p>{{ precision }}%</p>
+    </div>
+
+    <div class="overview-card">
+        <h3>Recall</h3>
+        <p>{{ recall }}%</p>
+    </div>
+
+    <div class="overview-card">
+        <h3>F1-score</h3>
+        <p>{{ f1 }}%</p>
+    </div>
+
+</div>
+
+<div class="evaluation-layout">
+
+    <div class="confusion-card">
+        <h2>Confusion Matrix</h2>
+        <p>Tổng mẫu so sánh: {{ total }}</p>
+
+        <div class="confusion-matrix">
+            <div></div>
+            <div class="matrix-label">Dự đoán: Không bệnh</div>
+            <div class="matrix-label">Dự đoán: Có bệnh</div>
+
+            <div class="matrix-label">Thực tế: Không bệnh</div>
+
+            <div class="matrix-cell tn">
+                <strong>{{ tn }}</strong>
+                <span>True Negative</span>
+            </div>
+
+            <div class="matrix-cell fp">
+                <strong>{{ fp }}</strong>
+                <span>False Positive</span>
+            </div>
+
+            <div class="matrix-label">Thực tế: Có bệnh</div>
+
+            <div class="matrix-cell fn">
+                <strong>{{ fn }}</strong>
+                <span>False Negative</span>
+            </div>
+
+            <div class="matrix-cell tp">
+                <strong>{{ tp }}</strong>
+                <span>True Positive</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="metric-note-card">
+        <h2>Thống kê so sánh</h2>
+
+        <p><strong>Tổng số mẫu:</strong> {{ total }}</p>
+        <p><strong>Dự đoán đúng:</strong> {{ correct }}</p>
+        <p><strong>Dự đoán sai:</strong> {{ wrong }}</p>
+
+        <hr>
+
+        <p><strong>Accuracy:</strong> Tỷ lệ dự đoán đúng trên toàn bộ dữ liệu.</p>
+        <p><strong>Precision:</strong> Trong các ca AI dự đoán có bệnh, có bao nhiêu ca đúng.</p>
+        <p><strong>Recall:</strong> Trong các ca thật sự có bệnh, AI phát hiện được bao nhiêu ca.</p>
+        <p><strong>F1-score:</strong> Chỉ số cân bằng giữa Precision và Recall.</p>
+
+        <div class="medical-note">
+            Với bài toán bệnh tim, Recall rất quan trọng vì cần hạn chế bỏ sót bệnh nhân có nguy cơ.
+        </div>
+
+        {% if export_file_url %}
+        <div class="download-box">
+            <a href="{{ export_file_url }}" class="download-btn" download>
+                ⬇ Tải file kết quả Excel
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

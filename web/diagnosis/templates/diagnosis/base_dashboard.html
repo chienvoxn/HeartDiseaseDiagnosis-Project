@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>HeartCare AI Dashboard</title>
+
+    <link rel="stylesheet" href="{% static 'diagnosis/style.css' %}">
+</head>
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            ❤ HeartCare AI
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="{% url 'dashboard' %}"
+            class="sidebar-item {% if request.path == '/dashboard/' %}active{% endif %}">
+                📊 Tổng quan dữ liệu
+            </a>
+
+            <a href="{% url 'predict' %}"
+            class="sidebar-item {% if request.path == '/predict/' %}active{% endif %}">
+                ❤️ Dự đoán bệnh tim
+            </a>
+
+            <a href="{% url 'evaluation' %}"
+                class="sidebar-item {% if request.path == '/evaluation/' %}active{% endif %}">
+                    📈 Đánh giá kết quả
+            </a>
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="sidebar-item logout logout-btn">
+                    🚪 Đăng xuất
+                </button>
+            </form>
+        </nav>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="dashboard-main">
+
+        <!-- TOPBAR -->
+        <header class="dashboard-topbar">
+
+            <div>
+                <h1>Dashboard</h1>
+                <p>Hệ thống dự đoán bệnh tim bằng Machine Learning</p>
+            </div>
+
+            <div class="topbar-user">
+                👨‍⚕️ {{ request.user.username }}
+            </div>
+
+        </header>
+
+        <!-- CONTENT -->
+        <section class="dashboard-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

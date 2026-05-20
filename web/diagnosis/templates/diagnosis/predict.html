@@ -1,0 +1,273 @@
+{% extends "diagnosis/base_dashboard.html" %}
+
+{% block content %}
+
+<section class="dashboard-predict-page">
+
+    <div class="dashboard-section-title">
+        <h2>Dự đoán nguy cơ bệnh tim</h2>
+    </div>
+
+    <div class="prediction-tabs">
+
+        <!-- NHẬP TAY -->
+        <div class="prediction-panel">
+            <div class="panel-heading">
+                <h3>Nhập dữ liệu</h3>
+                <p>Phù hợp khi cần kiểm tra nhanh một bệnh nhân.</p>
+            </div>
+
+            <form method="post" class="prediction-form js-analyze-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="manual">
+
+                {% for field in form %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+
+                    {% if field.errors %}
+                    <small class="form-error">{{ field.errors }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="submit-btn">
+                    Dự đoán ngay
+                </button>
+            </form>
+        </div>
+
+        <!-- UPLOAD FILE -->
+        <div class="prediction-panel upload-panel">
+            <div class="panel-heading">
+                <h3>Upload file dữ liệu</h3>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="csv-upload-form js-analyze-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="csv">
+
+               <div class="upload-box">
+    <div class="upload-icon">📁</div>
+    <h4>File bệnh nhân cần dự đoán</h4>
+    {{ upload_form.test_file }}
+
+    {% if upload_form.test_file.errors %}
+    <small class="form-error">{{ upload_form.test_file.errors }}</small>
+    {% endif %}
+</div>
+
+<div class="upload-box answer-upload">
+    <div class="upload-icon">✅</div>
+    <h4>File đáp án để so sánh</h4>
+
+    {{ upload_form.answer_file }}
+
+    {% if upload_form.answer_file.errors %}
+    <small class="form-error">{{ upload_form.answer_file.errors }}</small>
+    {% endif %}
+</div>
+                <button type="submit" class="submit-btn">
+                    Phân tích file
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    {% if upload_error %}
+    <div class="upload-error-box">
+        <h3>Lỗi khi đọc file</h3>
+        <p>{{ upload_error }}</p>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="result-box {{ risk_label }}">
+        <h2>{{ result }}</h2>
+
+        {% if risk_label == "danger" %}
+        <div class="recommendation">
+            ⚠ Hệ thống phát hiện nguy cơ bệnh tim. Bạn nên kiểm tra sức khỏe chuyên sâu.
+        </div>
+        {% else %}
+        <div class="recommendation">
+            ✔ Kết quả cho thấy nguy cơ thấp. Hãy duy trì lối sống lành mạnh.
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if shap_explanation %}
+    <div class="local-shap-box">
+        <div class="dashboard-section-title">
+            <h2>Giải thích kết quả dự đoán</h2>
+            <p>Các yếu tố dưới đây giúp giải thích kết quả cho bệnh nhân vừa nhập.</p>
+        </div>
+
+        <div class="local-shap-grid">
+            <div class="local-shap-card danger">
+                <h3>Yếu tố làm tăng nguy cơ</h3>
+
+                {% for item in shap_explanation.increase %}
+                <p>▲ {{ item }}</p>
+                {% empty %}
+                <p>Không có yếu tố tăng nguy cơ nổi bật.</p>
+                {% endfor %}
+            </div>
+
+            <div class="local-shap-card safe">
+                <h3>Yếu tố làm giảm nguy cơ</h3>
+
+                {% for item in shap_explanation.decrease %}
+                <p>▼ {{ item }}</p>
+                {% empty %}
+                <p>Không có yếu tố giảm nguy cơ nổi bật.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+   {% if batch_results %}
+
+{% if accuracy_info %}
+<div class="accuracy-box">
+
+    <div>
+        <h3>{{ accuracy_info.accuracy }}%</h3>
+        <p>Độ chính xác</p>
+    </div>
+
+    <div>
+        <h3>{{ accuracy_info.correct }}/{{ accuracy_info.total }}</h3>
+        <p>Dự đoán đúng</p>
+    </div>
+
+    <div>
+        <h3>{{ accuracy_info.wrong }}</h3>
+        <p>Dự đoán sai</p>
+    </div>
+
+</div>
+{% endif %}
+
+<div class="batch-result-box">
+
+    <div class="dashboard-section-title">
+        <h2>Danh sách bệnh nhân đã được dự đoán</h2>
+        <p>Hệ thống đã phân tích dữ liệu từ file tải lên.</p>
+    </div>
+
+    <div class="batch-table-wrapper">
+
+        <table class="batch-table">
+
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên bệnh nhân</th>
+                    <th>Tuổi</th>
+                    <th>Giới tính</th>
+                    <th>Kết quả AI</th>
+                    <th>Target thật</th>
+                    <th>So sánh</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in batch_results %}
+                <tr>
+
+                    <td>{{ item.stt }}</td>
+
+                    <td>{{ item.name }}</td>
+
+                    <td>{{ item.age }}</td>
+
+                    <td>{{ item.sex }}</td>
+
+                    <td>
+                        <span class="status-pill {{ item.risk_label }}">
+                            {{ item.result }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if item.actual_target != None %}
+                            {{ item.actual_target }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if item.match == "Đúng" %}
+                            <span class="match-correct">
+                                ✔ {{ item.match }}
+                            </span>
+
+                        {% elif item.match == "Sai" %}
+                            <span class="match-wrong">
+                                ✖ {{ item.match }}
+                            </span>
+
+                        {% else %}
+                            {{ item.match }}
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% if export_file_url %}
+    <div class="download-box">
+        <a href="{{ export_file_url }}" class="download-btn" download>
+            ⬇ Tải file kết quả Excel
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endif %}
+</section>
+
+<script>
+    const analyzeForms = document.querySelectorAll(".js-analyze-form");
+
+    analyzeForms.forEach(function (form) {
+        form.addEventListener("submit", function () {
+            const button = form.querySelector(".submit-btn");
+
+            if (button) {
+                button.innerHTML = "Đang phân tích dữ liệu...";
+                button.disabled = true;
+                button.classList.add("loading");
+            }
+        });
+    });
+
+    window.addEventListener("load", function () {
+        const resultBox = document.querySelector(".result-box") ||
+                          document.querySelector(".batch-result-box") ||
+                          document.querySelector(".upload-error-box");
+
+        if (resultBox) {
+            resultBox.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+    });
+</script>
+
+{% endblock %}
