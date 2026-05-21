@@ -1,0 +1,58 @@
+{% extends "diagnosis/base_dashboard.html" %}
+{% load custom_filters %}
+
+{% block content %}
+
+<div class="overview-grid">
+
+    <div class="overview-card">
+        <h3>📁 Dataset</h3>
+        <p>{{ dataset_name }}</p>
+    </div>
+
+    <div class="overview-card">
+        <h3>👥 Tổng bệnh nhân</h3>
+        <p>{{ total_patients }}</p>
+    </div>
+
+    <div class="overview-card">
+        <h3>❤️ Có bệnh tim</h3>
+        <p>{{ disease_count }}</p>
+    </div>
+
+    <div class="overview-card">
+        <h3>✅ Không bệnh tim</h3>
+        <p>{{ healthy_count }}</p>
+    </div>
+
+</div>
+
+<div class="dashboard-table">
+
+    <h2>Tổng quan dữ liệu thật</h2>
+
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    {% for col in columns %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in preview_data %}
+                <tr>
+                    {% for col in columns %}
+                    <td>{{ row|get_item:col }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
